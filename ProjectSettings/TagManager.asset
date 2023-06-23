@@ -4,12 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
+  - Wall
   - PlacementSpot
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
   - Water
   - UI
   - Background
