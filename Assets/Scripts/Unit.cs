@@ -6,13 +6,15 @@ public class Unit : MonoBehaviour
 {
     public LayerMask enemyLayer;
     public float attackRange = 5f;
-    public float attackDamage = 1f;
-    public float attackCooldown = 1f;
+    public float attackDamage = 10f;
+    public float attackCooldown = 0.1f;
     public float targetSelectionCooldown = 5f;
 
     private GameObject currentTarget;
     private float nextAttackTime;
     private float nextTargetSelectionTime;
+    public float MaxHealth { get; set; } = 100f;
+    public float CurrentHealth { get; set; } = 100f;
 
     private void Update()
     {
@@ -28,6 +30,10 @@ public class Unit : MonoBehaviour
         {
             Attack(currentTarget);
             nextAttackTime = Time.time + attackCooldown;
+        }
+        if (CurrentHealth <= 0)
+        {
+            Die();
         }
     }
 
@@ -72,5 +78,14 @@ public class Unit : MonoBehaviour
         target.GetComponent<Enemy>().TakeDamage(attackDamage);
     }
 
+    public void TakeDamage(float damage) {
+        CurrentHealth -= damage;
+        Debug.Log(CurrentHealth);
+    }
+
+    protected void Die()
+    {
+        Destroy(gameObject);
+    }
 }
 
