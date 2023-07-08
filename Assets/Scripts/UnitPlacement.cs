@@ -82,7 +82,7 @@ public class UnitPlacement : MonoBehaviour
             // Re-enable the collider
             unitCollider.enabled = true;
             currentUnit.tag = origTag;
-
+            currentUnit.GetComponent<Unit>().IsPlaced = true;
             currentUnit = null;
         }
 #else

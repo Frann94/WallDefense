@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public UnitPlacement unitPlacement; // Set this in the editor
     public UnitButton unitButtonPrefab; // Assign in editor.
     public Transform unitButtonParent; // Assign in editor.
+    [SerializeField]
     public List<UnitData> placedUnits = new List<UnitData>();
 
     private void Awake()
@@ -76,6 +77,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void RemoveUnit(Unit unit) {
+        UnitData unitData = unit.GetComponent<UnitData>();
+        Debug.Log("Unit exists? " + placedUnits.Contains(unitData));
+        Debug.Log("Name: " + unitData.name);
+        placedUnits.Remove(unitData);
+    }
     public void UpgradeUnit(UnitData unit)
     {
         // Add code here to upgrade the unit

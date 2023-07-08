@@ -128,10 +128,10 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 1536
-  attackRange: 5
-  attackDamage: 1
+  attackRange: 20
+  attackDamage: 10
   attackCooldown: 0.1
-  targetSelectionCooldown: 5
+  targetSelectionCooldown: 0.5
 --- !u!114 &-1136342419651508257
 MonoBehaviour:
   m_ObjectHideFlags: 0

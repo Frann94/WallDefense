@@ -14,26 +14,30 @@ public class Unit : MonoBehaviour
     private float nextAttackTime;
     private float nextTargetSelectionTime;
     public float MaxHealth { get; set; } = 100f;
-    public float CurrentHealth { get; set; } = 100f;
+    public float CurrentHealth { get; set; } = 5f;
+    public bool IsPlaced { get; set; } = false;
 
     private void Update()
     {
-        // Only select a new target if the cooldown has elapsed and the current target is null or out of range
-        if (Time.time >= nextTargetSelectionTime)
+        if (IsPlaced)
         {
-            SelectTarget();
-            nextTargetSelectionTime = Time.time + targetSelectionCooldown;
-        }
+            // Only select a new target if the cooldown has elapsed and the current target is null or out of range
+            if (Time.time >= nextTargetSelectionTime)
+            {
+                SelectTarget();
+                nextTargetSelectionTime = Time.time + targetSelectionCooldown;
+            }
 
-        // Only attack if there is a target and the attack cooldown has elapsed
-        if (currentTarget != null && Time.time >= nextAttackTime && Vector2.Distance(transform.position, currentTarget.transform.position) <= attackRange)
-        {
-            Attack(currentTarget);
-            nextAttackTime = Time.time + attackCooldown;
-        }
-        if (CurrentHealth <= 0)
-        {
-            Die();
+            // Only attack if there is a target and the attack cooldown has elapsed
+            if (currentTarget != null && Time.time >= nextAttackTime && Vector2.Distance(transform.position, currentTarget.transform.position) <= attackRange)
+            {
+                Attack(currentTarget);
+                nextAttackTime = Time.time + attackCooldown;
+            }
+            if (CurrentHealth <= 0)
+            {
+                Die();
+            }
         }
     }
 
@@ -66,14 +70,6 @@ public class Unit : MonoBehaviour
 
     private void Attack(GameObject target)
     {
-        // Get a bullet from the bullet pool
-        GameObject bullet = BulletPool.Instance.GetBullet();
-        bullet.transform.position = transform.position;
-        bullet.SetActive(true);
-
-        // Fire the bullet at the target
-        bullet.GetComponent<Bullet>().FireAtTarget(target);
-
         // Damage the target
         target.GetComponent<Enemy>().TakeDamage(attackDamage);
     }
@@ -85,6 +81,7 @@ public class Unit : MonoBehaviour
 
     protected void Die()
     {
+        GameManager.instance.RemoveUnit(this);
         Destroy(gameObject);
     }
 }

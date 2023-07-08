@@ -10,7 +10,7 @@ public class LevelManager : MonoBehaviour
     GameObject superiorSpawnerPoint;
     GameObject inferiorSpawnerPoint;
     float spawnTime = 2;
-    float spawnCount = 0;
+    float spawnCount = 10;
     GameObject player;
     Camera camera;
     float playingTime = 0f;
