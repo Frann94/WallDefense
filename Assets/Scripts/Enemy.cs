@@ -9,6 +9,8 @@ public class Enemy : MonoBehaviour
     public float CurrentHealth { get; set; } = 100f;
     public float Damage { get; set; } = 5f;
     public float Range { get; set; } = 1f;
+    public float FireRate { get; set; } = 1f;
+    public float fireCount;
 
     protected Rigidbody2D body;
     protected GameObject FindNearestToAttack()
@@ -46,6 +48,30 @@ public class Enemy : MonoBehaviour
         else
         {
             body.velocity = new Vector2(0, 0);
+            Attack(target);
         }
+    }
+
+    public void TakeDamage(float damage) {
+        CurrentHealth -= damage;
+    }
+
+    private void Attack(GameObject target) {
+        if (fireCount <= 0) {
+            if (target.GetComponent<Unit>() != null)
+            {
+                target.GetComponent<Unit>().TakeDamage(Damage);
+                fireCount = FireRate;
+            }
+            else if (target.GetComponent<Wall>() != null)
+            {
+                target.GetComponent<Wall>().TakeDamage(Damage);
+                fireCount = FireRate;
+            }
+        }
+    }
+
+    protected void Die() {
+        Destroy(gameObject);
     }
 }

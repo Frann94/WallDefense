@@ -5,9 +5,10 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     public float speed = 10f;
-
+    [SerializeField]
     private GameObject target;
     private bool isFiring;
+    private Vector3 targetPosition;
 
     public void FireAtTarget(GameObject target)
     {
@@ -17,17 +18,17 @@ public class Bullet : MonoBehaviour
 
     private void Update()
     {
+        // Move the bullet towards the target
+        transform.position = Vector2.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
         if (isFiring && target != null)
         {
-            // Move the bullet towards the target
-            transform.position = Vector2.MoveTowards(transform.position, target.transform.position, speed * Time.deltaTime);
-
-            // If the bullet has reached the target
-            if (transform.position == target.transform.position)
-            {
-                isFiring = false;
-                BulletPool.Instance.ReturnBullet(gameObject);
-            }
+            targetPosition = target.transform.position;            
+        }
+        // If the bullet has reached the target
+        if (transform.position == targetPosition)
+        {
+            isFiring = false;
+            BulletPool.Instance.ReturnBullet(gameObject);
         }
     }
 }
