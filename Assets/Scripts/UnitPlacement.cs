@@ -10,10 +10,12 @@ public class UnitPlacement : MonoBehaviour
     private GameObject currentUnit;
     private Collider2D unitCollider;
     private bool isPlacementValid = true;
+    private string origTag;
 
     public void PlaceUnit(GameObject unitPrefab)
     {
         currentUnit = Instantiate(unitPrefab);
+        origTag = currentUnit.tag;
         unitCollider = currentUnit.GetComponent<Collider2D>();
     }
 
@@ -49,6 +51,7 @@ public class UnitPlacement : MonoBehaviour
 
         // Disable the collider temporarily for overlap check
         unitCollider.enabled = false;
+        currentUnit.tag = "Untagged";
 
         Vector2 placementPos2D = new Vector2(placementPos.x, placementPos.y);  // Convert to 2D
         float radius = unitCollider.bounds.size.magnitude / 2f;  // Approximate radius
@@ -59,14 +62,10 @@ public class UnitPlacement : MonoBehaviour
         // Check for collisions at the unit's position with other units and no-placement zones
         isPlacementValid = !Physics2D.OverlapCircle(placementPos2D, radius, combinedLayerMask);
 
-        // Re-enable the collider
-        unitCollider.enabled = true;
-
         // Determine whether to snap based on distance to the closest spot
         GameObject closestSpot = gameManager.GetClosestPlacementSpot(placementPos);
         bool snapToSpot = closestSpot != null && Vector3.Distance(placementPos, closestSpot.transform.position) <= snapDistance;
 
-        Debug.Log("Is placement valid: " + isPlacementValid);
         if (snapToSpot)
         {
             currentUnit.transform.position = closestSpot.transform.position;
@@ -80,11 +79,19 @@ public class UnitPlacement : MonoBehaviour
         #if UNITY_STANDALONE || UNITY_WEBGL
         if (Input.GetMouseButtonDown(0) && (isPlacementValid || snapToSpot))
         {
+            // Re-enable the collider
+            unitCollider.enabled = true;
+            currentUnit.tag = origTag;
+
             currentUnit = null;
         }
 #else
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended && (isPlacementValid || snapToSpot))
         {
+            // Re-enable the collider
+            unitCollider.enabled = true;
+            currentUnit.tag = origTag;
+
             currentUnit = null;
         }
 #endif
