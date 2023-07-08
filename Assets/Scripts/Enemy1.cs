@@ -9,13 +9,16 @@ public class Enemy1 : Enemy
     {
         body = GetComponent<Rigidbody2D>();
         body.velocity = new Vector2(-Movespeeed, 0);
+        fireCount = FireRate;
     }
 
     // Update is called once per frame
     void Update()
     {
         Move();
+        fireCount -= Time.deltaTime;
+        if (CurrentHealth <= 0) {
+            Die();
+        }
     }
-
-    
 }

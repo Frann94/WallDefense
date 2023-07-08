@@ -41,7 +41,7 @@ public class LevelManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        levelTime.text = playingTime.ToString();
+        /*levelTime.text = playingTime.ToString();*/
         playingTime += Time.deltaTime;
         roundTimer -= Time.deltaTime;
         spawnCount -= Time.deltaTime;
