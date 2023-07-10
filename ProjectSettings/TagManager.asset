@@ -3,19 +3,20 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Wall
+  - PlacementSpot
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Background
+  - Middleground
+  - Foreground
+  - NoPlacement
+  - EnemyLayer
   - 
   - 
   - 
@@ -40,4 +41,13 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 676269953
+    locked: 0
+  - name: Middleground
+    uniqueID: 883908097
+    locked: 0
+  - name: Foreground
+    uniqueID: 2305147305
     locked: 0
