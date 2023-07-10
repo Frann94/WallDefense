@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
+    public Sprite unitIcon;
+    public int cost;
+    public float cooldown;
+
     public LayerMask enemyLayer;
     public float attackRange = 5f;
     public float attackDamage = 10f;
@@ -13,16 +17,26 @@ public class Unit : MonoBehaviour
     private GameObject currentTarget;
     private float nextAttackTime;
     private float nextTargetSelectionTime;
-    public float MaxHealth { get; set; } = 100f;
+    public float MaxHealth { get; set; } = 1000f;
     public float CurrentHealth { get; set; } = 5f;
-    public bool IsPlaced { get; set; } = false;
+    public event System.Action OnUnitDied;
+    public int unitIndex;
+    public int upgradeLevel;
+    private AudioSource audioSource;
+    public AudioClip shoot;
+    public AudioClip dying;
+    public float soundInterval;
+    private bool playShootSound = true;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
 
     private void Update()
     {
-        if (IsPlaced)
-        {
             // Only select a new target if the cooldown has elapsed and the current target is null or out of range
-            if (Time.time >= nextTargetSelectionTime)
+            if (Time.time >= nextTargetSelectionTime || currentTarget == null)
             {
                 SelectTarget();
                 nextTargetSelectionTime = Time.time + targetSelectionCooldown;
@@ -38,7 +52,6 @@ public class Unit : MonoBehaviour
             {
                 Die();
             }
-        }
     }
 
     private void SelectTarget()
@@ -71,17 +84,39 @@ public class Unit : MonoBehaviour
     private void Attack(GameObject target)
     {
         // Damage the target
+        
         target.GetComponent<Enemy>().TakeDamage(attackDamage);
+        if (playShootSound)
+        {
+            StartCoroutine(PlayShootingSound());
+        }
+    }
+
+    private IEnumerator PlayShootingSound()
+    {
+        playShootSound = false;
+        audioSource.clip = shoot;
+        audioSource.Play();
+        yield return new WaitForSeconds(soundInterval); // Wait for 1 second
+        playShootSound = true;
+    }
+
+    private IEnumerator PlayDyingSound()
+    {
+        audioSource.clip = dying;
+        audioSource.Play();
+        yield return new WaitForSeconds(2);
     }
 
     public void TakeDamage(float damage) {
         CurrentHealth -= damage;
-        Debug.Log(CurrentHealth);
     }
 
-    protected void Die()
+    public void Die()
     {
-        GameManager.instance.RemoveUnit(this);
+        StartCoroutine(PlayDyingSound());
+        GameManager.instance.RemoveUnit(unitIndex);
+        OnUnitDied?.Invoke();
         Destroy(gameObject);
     }
 }

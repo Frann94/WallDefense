@@ -1,34 +1,44 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance = null;
-    public GameObject[] placementSpots;
-    public UnitData[] playerUnits; // Assign in editor.
-    private UnitData selectedUnit;
-    public UnitPlacement unitPlacement; // Set this in the editor
-    public UnitButton unitButtonPrefab; // Assign in editor.
-    public Transform unitButtonParent; // Assign in editor.
-    [SerializeField]
-    public List<UnitData> placedUnits = new List<UnitData>();
+    public GameObject[] placementSpots; // Assign in editor
+    public Unit[] playerUnits; // Assign in editor
+    public UnitPlacement unitPlacement; //Assign in editor
+    public UnitButton unitButtonPrefab; // Assign in editor
+    public Transform unitButtonParent; // Assign in editor
+    private Unit selectedUnit;
+    public Dictionary<int, Unit> placedUnits = new Dictionary<int, Unit>();
+    private int unitIndex;
 
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
         }
+        if (Time.timeScale == 0)
+        {
+            Time.timeScale = 1;
+        }
     }
 
     private void Start()
     {
+        ResetGame();
+    }
+
+    private void ResetGame()
+    {
+        placedUnits.Clear();
         placementSpots = GameObject.FindGameObjectsWithTag("PlacementSpot");
         for (int i = 0; i < playerUnits.Length; i++)
         {
@@ -58,34 +68,47 @@ public class GameManager : MonoBehaviour
     public void SelectUnit(int unitIndex)
     {
         selectedUnit = playerUnits[unitIndex];
+        this.unitIndex = unitIndex;
     }
 
-    public void OnPlaceUnitButtonClicked()
+    public void OnPlaceUnitButtonPressed()
     {
         if (selectedUnit != null)
         {
-            Command command = new PlaceUnitCommand(unitPlacement, selectedUnit.unitPrefab);
-            command.Execute();
+            unitPlacement.OnUnitButtonPress(selectedUnit, unitIndex);
         }
     }
 
-    public void PlaceUnit(UnitData unit)
+    public void PlaceUnit(Unit unit, int unitIndex)
     {
-        if (!placedUnits.Contains(unit))
+        if (!placedUnits.ContainsKey(unitIndex))
         {
-            placedUnits.Add(unit);
+            placedUnits[unitIndex] = unit;
         }
     }
 
-    public void RemoveUnit(Unit unit) {
-        UnitData unitData = unit.GetComponent<UnitData>();
-        Debug.Log("Unit exists? " + placedUnits.Contains(unitData));
-        Debug.Log("Name: " + unitData.name);
-        placedUnits.Remove(unitData);
-    }
-    public void UpgradeUnit(UnitData unit)
+    public void RemoveUnit(int unitIndex)
     {
-        // Add code here to upgrade the unit
-        Debug.Log(unit.name + " was upgraded");
+        if (placedUnits.ContainsKey(unitIndex))
+        {
+            placedUnits.Remove(unitIndex);
+        }
+    }
+
+    public void UpgradeUnit(int unitIndex)
+    {
+        if (!placedUnits.ContainsKey(unitIndex))
+        {
+            return;
+        }
+        Unit unit = placedUnits[unitIndex];
+        unit.upgradeLevel++;
+        unit.MaxHealth += 10;
+        unit.attackDamage += 5;
+        Debug.Log(unit.name + " was upgraded to level " + unit.upgradeLevel);
+        if (unitPlacement.onUnitPlaced.TryGetValue(unitIndex, out UnityEvent unitPlacedEvent))
+        {
+            unitPlacedEvent?.Invoke();
+        }
     }
 }

@@ -11,6 +11,7 @@ public class Enemy : MonoBehaviour
     public float Range { get; set; } = 1f;
     public float FireRate { get; set; } = 1f;
     public float fireCount;
+    public AudioSource AudioSource { get; set; }
 
     protected Rigidbody2D body;
     protected GameObject FindNearestToAttack()
@@ -72,6 +73,13 @@ public class Enemy : MonoBehaviour
     }
 
     protected void Die() {
+        StartCoroutine(PlayDyingSound());
         Destroy(gameObject);
+    }
+
+    private IEnumerator PlayDyingSound()
+    {
+        AudioSource.Play();
+        yield return new WaitForSeconds(0.3f);
     }
 }
