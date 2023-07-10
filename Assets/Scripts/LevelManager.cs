@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour
@@ -12,7 +13,7 @@ public class LevelManager : MonoBehaviour
     float spawnTime = 2;
     float spawnCount = 10;
     GameObject player;
-    Camera camera;
+    new Camera camera;
     float playingTime = 0f;
     int inferiorArrayLimit = 0;
     int superiorArrayLimit = 0;
@@ -27,7 +28,9 @@ public class LevelManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        ResetGame();
         roundTimer = roundInterval;
+        
         camera = Camera.main;
         float xPos = camera.ScreenToWorldPoint(new Vector3(Screen.width + 5, 0, 0)).x;
         float yPos = camera.ScreenToWorldPoint(new Vector3(0, Screen.height-10, 0)).y;
@@ -38,8 +41,17 @@ public class LevelManager : MonoBehaviour
         superiorSpawnerPoint.transform.position = new Vector3(xPos, yPos, 0);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void ResetGame()
+    {
+        spawnCount = 10;
+        playingTime = 0f;
+        round = 1;
+        spawnAmount = 1;
+        superiorArrayLimit = 0;
+    }
+
+        // Update is called once per frame
+        void Update()
     {
         /*levelTime.text = playingTime.ToString();*/
         playingTime += Time.deltaTime;
@@ -61,7 +73,7 @@ public class LevelManager : MonoBehaviour
 
     void AdvanceRound() {
         if (round >= 3) {
-            Application.Quit();
+            SceneManager.LoadScene("MainMenu");
         }
         else{
             round += 1;

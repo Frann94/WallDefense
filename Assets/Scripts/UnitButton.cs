@@ -1,42 +1,66 @@
-using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Collections;
+using UnityEngine.Events;
 
-public class UnitButton : MonoBehaviour
+public class UnitButton : MonoBehaviour, IPointerDownHandler
 {
     public Image unitIcon;
     private int unitIndex;
     public Button unitButton;
     private bool isCooldown = false;
+    private float cooldownTime = 0f;
+    public Unit placedUnit;
+    public AudioClip placingSound;
+    public AudioClip upgradeSound;
+    private AudioSource audioSource;
 
     public void Initialize(int unitIndex, Sprite unitIconSprite)
     {
         this.unitIndex = unitIndex;
         unitIcon.sprite = unitIconSprite;
-        unitButton.onClick.AddListener(OnUnitButtonClicked);
+        GameManager.instance.playerUnits[unitIndex].OnUnitDied += ResetCooldown;
+        // Make sure the UnityEvent for this button is set up
+        if (!GameManager.instance.unitPlacement.onUnitPlaced.ContainsKey(unitIndex))
+        {
+            GameManager.instance.unitPlacement.onUnitPlaced[unitIndex] = new UnityEvent();
+        }
+        GameManager.instance.unitPlacement.onUnitPlaced[unitIndex].AddListener(StartCooldown);
+        audioSource = GetComponent<AudioSource>();
     }
 
-    public void OnUnitButtonClicked()
+    private void ResetCooldown()
+    {
+        isCooldown = false;
+        unitButton.interactable = true;
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
     {
         if (isCooldown)
         {
             return;
         }
-
-        UnitData selectedUnitData = GameManager.instance.playerUnits[unitIndex];
-        float cooldownTime = selectedUnitData.cooldown;
-
-        if (GameManager.instance.placedUnits.Contains(selectedUnitData))
+        Unit selectedUnit = GameManager.instance.playerUnits[unitIndex];
+        cooldownTime = selectedUnit.cooldown;
+        if (GameManager.instance.placedUnits.ContainsKey(unitIndex))
         {
-            GameManager.instance.UpgradeUnit(selectedUnitData);
+            audioSource.clip = upgradeSound;
+            audioSource.Play();
+            GameManager.instance.UpgradeUnit(unitIndex);
         }
         else
         {
+            audioSource.clip = placingSound;
+            audioSource.Play();
             GameManager.instance.SelectUnit(unitIndex);
-            GameManager.instance.OnPlaceUnitButtonClicked();
-            GameManager.instance.PlaceUnit(selectedUnitData);
+            GameManager.instance.unitPlacement.OnUnitButtonPress(selectedUnit, unitIndex);
         }
+    }
 
+    private void StartCooldown()
+    {
         StartCoroutine(Cooldown(cooldownTime));
     }
 
@@ -53,7 +77,7 @@ public class UnitButton : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Remove the listener when the button is destroyed.
-        unitButton.onClick.RemoveListener(OnUnitButtonClicked);
+        GameManager.instance.unitPlacement.onUnitPlaced[unitIndex].RemoveListener(StartCooldown);
     }
 }
+

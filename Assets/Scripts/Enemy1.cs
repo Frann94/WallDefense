@@ -10,6 +10,7 @@ public class Enemy1 : Enemy
         body = GetComponent<Rigidbody2D>();
         body.velocity = new Vector2(-Movespeeed, 0);
         fireCount = FireRate;
+        AudioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame

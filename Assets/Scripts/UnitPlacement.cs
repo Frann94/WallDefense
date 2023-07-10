@@ -1,24 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class UnitPlacement : MonoBehaviour
 {
     public GameManager gameManager; // Set this in the editor
     public LayerMask unitLayer; // Set this in the editor to the layer(s) where units reside
     public float snapDistance = 1f; // Set this in the editor to the distance at which units will snap to spots
-    private GameObject currentUnit;
+    private Unit currentUnit;
     private Collider2D unitCollider;
     private bool isPlacementValid = true;
     private string origTag;
+    private int unitIndex;
+    public Dictionary<int, UnityEvent> onUnitPlaced = new Dictionary<int, UnityEvent>();
+    public AudioClip unitPlaced;
+    public AudioClip invalidPlace;
+    private AudioSource audioSource;
 
-    public void PlaceUnit(GameObject unitPrefab)
+    public void Awake()
     {
-        currentUnit = Instantiate(unitPrefab);
+        audioSource = GetComponent<AudioSource>();
+    }
+    public void OnUnitButtonPress(Unit unit, int unitIndex)
+    {
+        currentUnit = Instantiate(unit);
         origTag = currentUnit.tag;
         unitCollider = currentUnit.GetComponent<Collider2D>();
+        this.unitIndex = unitIndex;
     }
-
 
     private void Update()
     {
@@ -31,10 +41,6 @@ public class UnitPlacement : MonoBehaviour
         // Vector to store the position where we will place our unit
         Vector3 placementPos;
 
-        #if UNITY_STANDALONE || UNITY_WEBGL
-        // Mouse input for standalone or web builds
-        placementPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        #else
         // Touch input for mobile builds
         if (Input.touchCount > 0)
         {
@@ -45,7 +51,6 @@ public class UnitPlacement : MonoBehaviour
         {
             return;
         }
-        #endif
 
         placementPos.z = 0;
 
@@ -75,28 +80,31 @@ public class UnitPlacement : MonoBehaviour
             currentUnit.transform.position = placementPos;
         }
 
-        // If the user lifts their finger or releases the mouse button, place the unit
-        #if UNITY_STANDALONE || UNITY_WEBGL
-        if (Input.GetMouseButtonDown(0) && (isPlacementValid || snapToSpot))
+        // If the user lifts their finger, place the unit if valid, else destroy the unit
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended)
         {
-            // Re-enable the collider
-            unitCollider.enabled = true;
-            currentUnit.tag = origTag;
-            currentUnit.GetComponent<Unit>().IsPlaced = true;
-            currentUnit = null;
+            if (isPlacementValid || snapToSpot)
+            {
+                audioSource.clip = unitPlaced;
+                audioSource.Play();
+                // Re-enable the collider
+                unitCollider.enabled = true;
+                currentUnit.tag = origTag;
+                GameManager.instance.PlaceUnit(currentUnit, unitIndex);
+                if (onUnitPlaced.TryGetValue(unitIndex, out UnityEvent unitPlacedEvent))
+                {
+                    unitPlacedEvent?.Invoke();
+                }
+                currentUnit = null;
+            }
+            else
+            {
+                audioSource.clip = invalidPlace;
+                audioSource.Play();
+                Destroy(currentUnit.gameObject);
+                currentUnit = null;
+            }
         }
-#else
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended && (isPlacementValid || snapToSpot))
-        {
-            // Re-enable the collider
-            unitCollider.enabled = true;
-            currentUnit.tag = origTag;
-
-            currentUnit = null;
-        }
-#endif
     }
-
-
 }
 
