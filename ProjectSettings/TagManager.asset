@@ -6,17 +6,19 @@ TagManager:
   tags:
   - Wall
   - PlacementSpot
+  - BlockedUnit
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
   - Water
+  - Water
   - UI
-  - Background
   - Middleground
   - Foreground
   - NoPlacement
   - EnemyLayer
+  - 
   - 
   - 
   - 

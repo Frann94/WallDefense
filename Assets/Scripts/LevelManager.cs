@@ -1,96 +1,119 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+using TMPro;
 
 public class LevelManager : MonoBehaviour
 {
-    [SerializeField]
-    GameObject[] enemies;
-    GameObject superiorSpawnerPoint;
-    GameObject inferiorSpawnerPoint;
-    float spawnTime = 2;
-    float spawnCount = 10;
-    GameObject player;
-    new Camera camera;
-    float playingTime = 0f;
-    int inferiorArrayLimit = 0;
-    int superiorArrayLimit = 0;
-    float roundInterval = 30f;
-    float roundTimer;
-    int round = 1;
-    int spawnAmount = 1;
-    int LevelNumber;
-    [SerializeField]
-    TMPro.TextMeshProUGUI levelTime;
+    [SerializeField] private GameObject[] _enemies;
+    [SerializeField] private GameObject _superiorSpawnerPoint;
+    [SerializeField] private GameObject _inferiorSpawnerPoint;
+    [SerializeField] private TextMeshProUGUI _levelTimeText;
+    [SerializeField] private TextMeshProUGUI _pointsText;
 
-    // Start is called before the first frame update
-    void Start()
+    public int TotalPointsEarned { get; private set; }
+    public int Points { get; set; }
+
+    private float _spawnTime = 2f;
+    private float _spawnCount = 10f;
+    private float _playingTime = 0f;
+    private float _roundInterval = 30f;
+    private float _roundTimer;
+    private int _spawnAmount = 1;
+    private int _inferiorArrayLimit = 0;
+    private int _superiorArrayLimit = 0;
+    private int _round;
+    private float _pointsIncreaseTimer = 0f;
+
+    private void Start()
     {
         ResetGame();
-        roundTimer = roundInterval;
-        
-        camera = Camera.main;
-        float xPos = camera.ScreenToWorldPoint(new Vector3(Screen.width + 5, 0, 0)).x;
-        float yPos = camera.ScreenToWorldPoint(new Vector3(0, Screen.height-10, 0)).y;
-
-        inferiorSpawnerPoint = new GameObject();
-        inferiorSpawnerPoint.transform.position = new Vector3(xPos, -yPos, 0);
-        superiorSpawnerPoint = new GameObject();
-        superiorSpawnerPoint.transform.position = new Vector3(xPos, yPos, 0);
+        _roundTimer = _roundInterval;
     }
 
     private void ResetGame()
     {
-        spawnCount = 10;
-        playingTime = 0f;
-        round = 1;
-        spawnAmount = 1;
-        superiorArrayLimit = 0;
+        _spawnCount = 10f;
+        _playingTime = 0f;
+        _round = 1;
+        _spawnAmount = 1;
+        _superiorArrayLimit = 0;
+        Points = 0;
+        UpdatePointsUI();
     }
 
-        // Update is called once per frame
-        void Update()
+    public void UpdatePointsUI()
     {
-        /*levelTime.text = playingTime.ToString();*/
-        playingTime += Time.deltaTime;
-        roundTimer -= Time.deltaTime;
-        spawnCount -= Time.deltaTime;
+        _pointsText.text = $"Points: {Points}";
+    }
 
-        if (roundTimer <= 0) {
-            AdvanceRound();
-            roundTimer = roundInterval;
+    private void Update()
+    {
+        _playingTime += Time.deltaTime;
+        _roundTimer -= Time.deltaTime;
+        _spawnCount -= Time.deltaTime;
+        UpdateLevelTimeUI();
+        _pointsIncreaseTimer += Time.deltaTime;
+
+        if (_pointsIncreaseTimer >= 1f)
+        {
+            IncrementPoints(1);
+            _pointsIncreaseTimer = 0f;
         }
 
-        if (spawnCount <= 0)
+        if (_roundTimer <= 0)
+        {
+            AdvanceRound();
+            _roundTimer = _roundInterval;
+        }
+
+        if (_spawnCount <= 0)
         {
             Spawn();
-            spawnCount = spawnTime;
-        }
-       
-    }
-
-    void AdvanceRound() {
-        if (round >= 3) {
-            SceneManager.LoadScene("MainMenu");
-        }
-        else{
-            round += 1;
-            superiorArrayLimit += 1;
-            spawnAmount += 1;
+            _spawnCount = _spawnTime;
         }
     }
 
-    void Spawn() {
-        for (int i = 0; i < spawnAmount; i++)
+    private void UpdateLevelTimeUI()
+    {
+        int minutes = Mathf.FloorToInt(_playingTime / 60f);
+        int seconds = Mathf.FloorToInt(_playingTime % 60f);
+        string formattedTime = string.Format("{0:0}:{1:00}", minutes, seconds);
+        _levelTimeText.text = $"Timer: {formattedTime}";
+    }
+
+    public void IncrementPoints(int amount)
+    {
+        Points += amount;
+        TotalPointsEarned += amount;
+        UpdatePointsUI();
+    }
+
+    private void AdvanceRound()
+    {
+        _round++;
+        if (_enemies.Length>_superiorArrayLimit + 1)
         {
-            GameObject enemy = enemies[Random.Range(inferiorArrayLimit, superiorArrayLimit+1)];
-            Vector3 pos = new Vector3(superiorSpawnerPoint.transform.position.x,
-                                      Random.Range(inferiorSpawnerPoint.transform.position.y, superiorSpawnerPoint.transform.position.y),
+            _superiorArrayLimit++;
+        }
+        _spawnAmount++;
+    }
+
+    private void Spawn()
+    {
+        for (int i = 0; i < _spawnAmount; i++)
+        {
+            GameObject enemy = _enemies[Random.Range(_inferiorArrayLimit, _superiorArrayLimit)];
+            Vector3 pos = new Vector3(_superiorSpawnerPoint.transform.position.x,
+                                      Random.Range(_inferiorSpawnerPoint.transform.position.y, _superiorSpawnerPoint.transform.position.y),
                                       transform.position.z);
 
             Instantiate(enemy, pos, Quaternion.identity);
         }
+    }
+
+    public string GetFormattedTime()
+    {
+        int minutes = Mathf.FloorToInt(_playingTime / 60f);
+        int seconds = Mathf.FloorToInt(_playingTime % 60f);
+        return string.Format("{0:0}:{1:00}", minutes, seconds);
     }
 }

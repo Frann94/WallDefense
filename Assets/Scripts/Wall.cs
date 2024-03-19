@@ -3,16 +3,10 @@ using UnityEngine.SceneManagement;
 
 public class Wall : MonoBehaviour
 {
-    public float MaxHealth { get; set; } = 100f;
-    public float CurrentHealth { get; set; } = 100f;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public float MaxHealth { get; private set; } = 100f;
+    public float CurrentHealth { get; private set; } = 100f;
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (CurrentHealth <= 0)
         {
@@ -20,12 +14,21 @@ public class Wall : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float damage) {
+    public void TakeDamage(float damage)
+    {
         CurrentHealth -= damage;
+        if (CurrentHealth <= 0)
+        {
+            Lose();
+        }
     }
 
-    private void Lose() {
-        Time.timeScale = 0;
-        SceneManager.LoadScene("MainMenu");
+    private void Lose()
+    {
+        GameOverManager gameOverManager = FindObjectOfType<GameOverManager>();
+        if (gameOverManager != null)
+        {
+            gameOverManager.ActivateGameOverPanel();
+        }
     }
 }

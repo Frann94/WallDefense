@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -10,10 +9,47 @@ public class Enemy : MonoBehaviour
     public float Damage { get; set; } = 5f;
     public float Range { get; set; } = 1f;
     public float FireRate { get; set; } = 1f;
-    public float fireCount;
     public AudioSource AudioSource { get; set; }
+    public bool IsDead { get => _isDead; protected set => _isDead = value; }
 
-    protected Rigidbody2D body;
+    protected Rigidbody2D Body;
+    private Animator _animator;
+    private bool _isDead;
+    private bool _canAttack = true;
+
+    void Awake()
+    {
+        _animator = GetComponent<Animator>();
+    }
+
+    protected void Move()
+    {
+        if (!_isDead) {
+            GameObject target = FindNearestToAttack();
+            if ((target.transform.position - transform.position).magnitude > Range)
+            {
+                if (target.tag == "Wall" && transform.position.x > target.transform.position.x)
+                {
+                    Body.velocity = new Vector2(-Movespeeed, 0f);
+                }
+                else if (target.tag == "Player")
+                {
+                    Body.velocity = (FindNearestToAttack().transform.position - transform.position).normalized * Movespeeed;
+                }
+                else
+                {
+                    Body.velocity = new Vector2(0, 0);
+                    Attack(target);
+                }
+            }
+            else
+            {
+                Body.velocity = new Vector2(0, 0);
+                Attack(target);
+            }
+        }
+    }
+
     protected GameObject FindNearestToAttack()
     {
         GameObject[] attackable = GameObject.FindGameObjectsWithTag("Player");
@@ -28,58 +64,81 @@ public class Enemy : MonoBehaviour
         return target;
     }
 
-    protected void Move()
+    private void Attack(GameObject target)
     {
-        GameObject target = FindNearestToAttack();
-        if ((target.transform.position - transform.position).magnitude > Range)
+        if (_canAttack && !IsDead)
         {
-            if (target.tag == "Wall" && transform.position.x > target.transform.position.x)
-            {
-                body.velocity = new Vector2(-Movespeeed, 0f);
-            }
-            else if (target.tag == "Player")
-            {
-                body.velocity = (FindNearestToAttack().transform.position - transform.position).normalized * Movespeeed;
-            }
-            else
-            {
-                body.velocity = new Vector2(0, 0);
-            }
-        }
-        else
-        {
-            body.velocity = new Vector2(0, 0);
-            Attack(target);
+            StartCoroutine(PerformAttack(target));
         }
     }
 
-    public void TakeDamage(float damage) {
+    private IEnumerator PerformAttack(GameObject target)
+    {
+        _canAttack = false;
+        _animator.SetBool("isAttacking", true);
+        yield return new WaitForSeconds(1.8f);
+        DealDamage(target);
+        _animator.SetBool("isAttacking", false);
+        _canAttack = true;
+    }
+
+    private void DealDamage(GameObject target)
+    {
+        var unitTarget = target.GetComponent<Unit>();
+        if (unitTarget != null)
+        {
+            unitTarget.TakeDamage(Damage);
+        }
+
+        var wallTarget = target.GetComponent<Wall>();
+        if (wallTarget != null)
+        {
+            wallTarget.TakeDamage(Damage);
+        }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        if (_isDead)
+        {
+            return;
+        }
+
         CurrentHealth -= damage;
-    }
-
-    private void Attack(GameObject target) {
-        if (fireCount <= 0) {
-            if (target.GetComponent<Unit>() != null)
-            {
-                target.GetComponent<Unit>().TakeDamage(Damage);
-                fireCount = FireRate;
-            }
-            else if (target.GetComponent<Wall>() != null)
-            {
-                target.GetComponent<Wall>().TakeDamage(Damage);
-                fireCount = FireRate;
-            }
+        if (CurrentHealth <= 0)
+        {
+            Die();
         }
     }
 
-    protected void Die() {
-        StartCoroutine(PlayDyingSound());
-        Destroy(gameObject);
+    protected void Die()
+    {
+        if (IsDead)
+        {
+            return;
+        }
+
+        IncrementPlayerPoints();
+        StartCoroutine(PlayDyingSoundAndDestroy());
     }
 
-    private IEnumerator PlayDyingSound()
+    private void IncrementPlayerPoints()
     {
+        LevelManager levelManager = FindObjectOfType<LevelManager>();
+        if (levelManager != null)
+        {
+            levelManager.IncrementPoints(10); 
+        }
+    }
+
+    private IEnumerator PlayDyingSoundAndDestroy()
+    {
+        IsDead = true;
+        _animator.SetBool("isDead", true);
+        Body.velocity = Vector2.zero;
+        GetComponent<Collider2D>().enabled = false;
         AudioSource.Play();
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(5.0f);
+        Destroy(gameObject);
     }
 }

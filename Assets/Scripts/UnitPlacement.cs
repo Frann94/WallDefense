@@ -5,106 +5,114 @@ using UnityEngine.Events;
 
 public class UnitPlacement : MonoBehaviour
 {
-    public GameManager gameManager; // Set this in the editor
-    public LayerMask unitLayer; // Set this in the editor to the layer(s) where units reside
-    public float snapDistance = 1f; // Set this in the editor to the distance at which units will snap to spots
-    private Unit currentUnit;
-    private Collider2D unitCollider;
-    private bool isPlacementValid = true;
-    private string origTag;
-    private int unitIndex;
+    public GameManager gameManager;
+    public LayerMask unitLayer;
+    public float snapDistance = 1f;
     public Dictionary<int, UnityEvent> onUnitPlaced = new Dictionary<int, UnityEvent>();
     public AudioClip unitPlaced;
     public AudioClip invalidPlace;
-    private AudioSource audioSource;
 
-    public void Awake()
+    private Unit _currentUnit;
+    private Collider2D _unitCollider;
+    private bool _isPlacementValid = true;
+    private string _origTag;
+    private int _unitIndex;
+    private AudioSource _audioSource;
+
+    private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
+        _audioSource = GetComponent<AudioSource>();
     }
-    public void OnUnitButtonPress(Unit unit, int unitIndex)
+
+    public void OnUnitButtonPress(Unit unit, int index)
     {
-        currentUnit = Instantiate(unit);
-        origTag = currentUnit.tag;
-        unitCollider = currentUnit.GetComponent<Collider2D>();
-        this.unitIndex = unitIndex;
+        _currentUnit = Instantiate(unit);
+        _currentUnit.IsBeingPlaced = true;
+        _origTag = _currentUnit.tag;
+        _unitCollider = _currentUnit.GetComponent<Collider2D>();
+        _unitIndex = index;
+
+        AdjustSpriteOpacity(_currentUnit, 0.5f);
+    }
+
+    private void AdjustSpriteOpacity(Unit unit, float opacity)
+    {
+        SpriteRenderer[] spriteRenderers = unit.GetComponentsInChildren<SpriteRenderer>();
+        foreach (var spriteRenderer in spriteRenderers)
+        {
+            Color color = spriteRenderer.color;
+            color.a = opacity;
+            spriteRenderer.color = color;
+        }
     }
 
     private void Update()
     {
-        // If there's no unit currently being placed, we don't need to do anything
-        if (currentUnit == null)
+        if (_currentUnit == null)
         {
             return;
         }
 
-        // Vector to store the position where we will place our unit
-        Vector3 placementPos;
-
-        // Touch input for mobile builds
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            placementPos = Camera.main.ScreenToWorldPoint(touch.position);
-        }
-        else
-        {
-            return;
-        }
+        Vector3 placementPos = Input.touchCount > 0 ?
+            Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position) :
+            Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
         placementPos.z = 0;
-
-        // Disable the collider temporarily for overlap check
-        unitCollider.enabled = false;
-        currentUnit.tag = "Untagged";
-
-        Vector2 placementPos2D = new Vector2(placementPos.x, placementPos.y);  // Convert to 2D
-        float radius = unitCollider.bounds.size.magnitude / 2f;  // Approximate radius
-
-        // Combine the unit layer and the no-placement layer into one LayerMask
-        LayerMask combinedLayerMask = unitLayer | LayerMask.GetMask("NoPlacement");
-
-        // Check for collisions at the unit's position with other units and no-placement zones
-        isPlacementValid = !Physics2D.OverlapCircle(placementPos2D, radius, combinedLayerMask);
-
-        // Determine whether to snap based on distance to the closest spot
-        GameObject closestSpot = gameManager.GetClosestPlacementSpot(placementPos);
-        bool snapToSpot = closestSpot != null && Vector3.Distance(placementPos, closestSpot.transform.position) <= snapDistance;
-
-        if (snapToSpot)
+        if (Input.GetMouseButtonUp(0))
         {
-            currentUnit.transform.position = closestSpot.transform.position;
+            CheckPlacementValidityAndSnap(placementPos, true);
         }
         else
         {
-            currentUnit.transform.position = placementPos;
+            CheckPlacementValidityAndSnap(placementPos, false);
         }
+    }
 
-        // If the user lifts their finger, place the unit if valid, else destroy the unit
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended)
+    private void CheckPlacementValidityAndSnap(Vector3 placementPos, bool attemptToPlace)
+    {
+        _unitCollider.enabled = false;
+        _currentUnit.tag = "Untagged";
+        Vector2 placementPos2D = placementPos;
+        float radius = _unitCollider.bounds.size.magnitude / 2f;
+        LayerMask combinedLayerMask = unitLayer | LayerMask.GetMask("NoPlacement");
+
+        _isPlacementValid = !Physics2D.OverlapCircle(placementPos2D, radius, combinedLayerMask);
+
+        GameObject closestSpot = gameManager.GetClosestPlacementSpot(placementPos);
+        bool snapToSpot = closestSpot != null && Vector3.Distance(placementPos, closestSpot.transform.position) <= snapDistance;
+        _currentUnit.transform.position = snapToSpot ? closestSpot.transform.position : placementPos;
+
+        if (attemptToPlace)
         {
-            if (isPlacementValid || snapToSpot)
+            PlaceUnitOrDestroy(snapToSpot);
+        }
+    }
+
+    private void PlaceUnitOrDestroy(bool snapToSpot)
+    {
+        if (_isPlacementValid || snapToSpot)
+        {
+            _audioSource.clip = unitPlaced;
+            _audioSource.Play();
+            _unitCollider.enabled = true;
+            _currentUnit.tag = _origTag;
+            _currentUnit.IsBeingPlaced = false;
+
+            AdjustSpriteOpacity(_currentUnit, 1.0f);
+            GameManager.instance.PlaceUnit(_currentUnit, _unitIndex);
+
+            if (onUnitPlaced.TryGetValue(_unitIndex, out UnityEvent unitPlacedEvent))
             {
-                audioSource.clip = unitPlaced;
-                audioSource.Play();
-                // Re-enable the collider
-                unitCollider.enabled = true;
-                currentUnit.tag = origTag;
-                GameManager.instance.PlaceUnit(currentUnit, unitIndex);
-                if (onUnitPlaced.TryGetValue(unitIndex, out UnityEvent unitPlacedEvent))
-                {
-                    unitPlacedEvent?.Invoke();
-                }
-                currentUnit = null;
+                unitPlacedEvent?.Invoke();
             }
-            else
-            {
-                audioSource.clip = invalidPlace;
-                audioSource.Play();
-                Destroy(currentUnit.gameObject);
-                currentUnit = null;
-            }
+            _currentUnit = null;
+        }
+        else
+        {
+            _audioSource.clip = invalidPlace;
+            _audioSource.Play();
+            Destroy(_currentUnit.gameObject);
+            _currentUnit = null;
         }
     }
 }
-
