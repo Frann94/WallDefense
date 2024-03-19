@@ -22,6 +22,7 @@ public class MainMenu : MonoBehaviour
 
     private IEnumerator LoadSceneAfterSound(string sceneName)
     {
+        menuSound.Play();
         yield return new WaitForSeconds(menuSound.clip.length);
         if (sceneName != null)
         {

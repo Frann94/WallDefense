@@ -74,12 +74,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -1281192421, guid: c7d332c957b7e524e8f937652724dc57, type: 3}
+  m_Sprite: {fileID: 1054288472, guid: dfb2462759a1c914f801ebd28556bd1b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.23, y: 0.24}
+  m_Size: {x: 0.29, y: 0.37}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -97,7 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 185b1d3a7c387314d9a51c7206327121, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitIcon: {fileID: -1281192421, guid: c7d332c957b7e524e8f937652724dc57, type: 3}
+  unitIcon: {fileID: 1443604135, guid: c7d332c957b7e524e8f937652724dc57, type: 3}
   cost: 0
   cooldown: 0
   enemyLayer:

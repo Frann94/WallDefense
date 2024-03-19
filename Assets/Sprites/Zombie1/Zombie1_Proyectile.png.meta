@@ -1,0 +1,442 @@
+fileFormatVersion: 2
+guid: c5d9afce2744f0744b5a3135cff649fa
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 15
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Zombie1_Proyectile_8
+      rect:
+        serializedVersion: 2
+        x: 193
+        y: 9
+        width: 39
+        height: 36
+      alignment: 9
+      pivot: {x: 0.71794873, y: 0.10555556}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee735526737cc1a46bb498a719a6ad71
+      internalID: 1570357198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Zombie1_Proyectile_9
+      rect:
+        serializedVersion: 2
+        x: 235
+        y: 8
+        width: 41
+        height: 38
+      alignment: 9
+      pivot: {x: 0.68292683, y: 0.1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c68fc693e589de3428f4093000e3f9e0
+      internalID: 182651096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Zombie1_Proyectile_10
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 6
+        width: 19
+        height: 19
+      alignment: 9
+      pivot: {x: 0.7, y: 0.2}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5dbaa9c3a8c9a6f4bbaead32a2d1e704
+      internalID: 1735598334
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Zombie1_Proyectile_12
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 7
+        width: 24
+        height: 24
+      alignment: 9
+      pivot: {x: 0.75, y: 0.15833333}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cdf6bfc1a916df44bb12167311b516cc
+      internalID: -53809328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Zombie1_Proyectile_19
+      rect:
+        serializedVersion: 2
+        x: 151
+        y: 8
+        width: 36
+        height: 33
+      alignment: 9
+      pivot: {x: 0.6666667, y: 0.11515152}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e055708108e1cd244a995fe8d8522f14
+      internalID: 279042015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Zombie1_Proyectile_20
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 7
+        width: 11
+        height: 7
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: faf58daffc5d98c40986e560c9506c77
+      internalID: 545937568
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Zombie1_Proyectile_27
+      rect:
+        serializedVersion: 2
+        x: 75
+        y: 3
+        width: 30
+        height: 28
+      alignment: 9
+      pivot: {x: 0.73333335, y: 0.13571428}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d2cd78b3d4367149964f592a0078925
+      internalID: 97953709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Zombie1_Proyectile_29
+      rect:
+        serializedVersion: 2
+        x: 109
+        y: 2
+        width: 33
+        height: 30
+      alignment: 9
+      pivot: {x: 0.6969697, y: 0.12666667}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd4e47104173fac4fad198baaced7871
+      internalID: -803529919
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Zombie1_Proyectile_0
+      rect:
+        serializedVersion: 2
+        x: 285
+        y: 8
+        width: 42
+        height: 39
+      alignment: 9
+      pivot: {x: 0.6666667, y: 0.0974359}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c601693d28144434cacb241d41dffede
+      internalID: -34321194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Zombie1_Proyectile_1
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 5
+        width: 43
+        height: 40
+      alignment: 9
+      pivot: {x: 0.6511628, y: 0.095}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2350e7f4b76a794f92ec70c6cdb7f1a
+      internalID: -1395986042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Zombie1_Proyectile_2
+      rect:
+        serializedVersion: 2
+        x: 385
+        y: 9
+        width: 44
+        height: 40
+      alignment: 9
+      pivot: {x: 0.6363636, y: 0.095}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 40232c8663b35794fb67aee5ddeab21a
+      internalID: 1539628348
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Zombie1_Proyectile_3
+      rect:
+        serializedVersion: 2
+        x: 435
+        y: 7
+        width: 44
+        height: 40
+      alignment: 9
+      pivot: {x: 0.6363636, y: 0.095}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1e88fad90104984e985871156d1d114
+      internalID: 2022361523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Zombie1_Proyectile_14: -1003146121
+      Zombie1_Proyectile_24: -1424995150
+      Zombie1_Proyectile_6: 969801029
+      Zombie1_Proyectile_12: -53809328
+      Zombie1_Proyectile_16: -139847560
+      Zombie1_Proyectile_19: 279042015
+      Zombie1_Proyectile_4: -1625169071
+      Zombie1_Proyectile_28: -127264540
+      Zombie1_Proyectile_30: -1617869001
+      Zombie1_Proyectile_8: 1570357198
+      Zombie1_Proyectile_10: 1735598334
+      Zombie1_Proyectile_15: 1534898207
+      Zombie1_Proyectile_0: -34321194
+      Zombie1_Proyectile_5: -64848512
+      Zombie1_Proyectile_3: 2022361523
+      Zombie1_Proyectile_29: -803529919
+      Zombie1_Proyectile_7: -1350479704
+      Zombie1_Proyectile_22: 1914917654
+      Zombie1_Proyectile_27: 97953709
+      Zombie1_Proyectile_18: 2074531754
+      Zombie1_Proyectile_21: 566660018
+      Zombie1_Proyectile_2: 1539628348
+      Zombie1_Proyectile_20: 545937568
+      Zombie1_Proyectile_9: 182651096
+      Zombie1_Proyectile_26: -1639781080
+      Zombie1_Proyectile_11: 1885221128
+      Zombie1_Proyectile_17: -255700130
+      Zombie1_Proyectile_13: 137325080
+      Zombie1_Proyectile_1: -1395986042
+      Zombie1_Proyectile_23: 21167494
+      Zombie1_Proyectile_25: -1723833070
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
