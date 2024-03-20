@@ -17,8 +17,8 @@ public class Unit : MonoBehaviour
     private float nextAttackTime;
     private float nextTargetSelectionTime;
 
-    public float MaxHealth { get; set; } = 1000f;
-    public float CurrentHealth { get; set; } = 50f;
+    public float MaxHealth { get; set; } = 50f;
+    public float CurrentHealth = 50f;
     public int unitIndex;
     public int upgradeLevel;
 
@@ -43,6 +43,10 @@ public class Unit : MonoBehaviour
         if (gameObject.CompareTag("BlockedUnit") || IsBeingPlaced || animator.GetBool("isDead"))
         {
             return;
+        }
+        if (CurrentHealth<MaxHealth)
+        {
+            CurrentHealth += 1f * Time.deltaTime;
         }
 
         if (currentTarget == null || currentTarget.GetComponent<Enemy>().IsDead)
@@ -160,7 +164,8 @@ public class Unit : MonoBehaviour
     public void UpgradeUnit()
     {
         upgradeLevel++;
-        CurrentHealth += 5;
+        CurrentHealth += 20;
+        MaxHealth += 20;
 
         if (attackCooldown > 0.2f)
         {

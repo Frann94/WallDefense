@@ -13,11 +13,12 @@ public class UnitPlacement : MonoBehaviour
     public AudioClip invalidPlace;
 
     private Unit _currentUnit;
-    private Collider2D _unitCollider;
+    private BoxCollider2D _unitCollider;
     private bool _isPlacementValid = true;
     private string _origTag;
     private int _unitIndex;
     private AudioSource _audioSource;
+    private Color _origColor;
 
     private void Awake()
     {
@@ -29,7 +30,7 @@ public class UnitPlacement : MonoBehaviour
         _currentUnit = Instantiate(unit);
         _currentUnit.IsBeingPlaced = true;
         _origTag = _currentUnit.tag;
-        _unitCollider = _currentUnit.GetComponent<Collider2D>();
+        _unitCollider = _currentUnit.GetComponent<BoxCollider2D>();
         _unitIndex = index;
 
         AdjustSpriteOpacity(_currentUnit, 0.5f);
@@ -37,13 +38,11 @@ public class UnitPlacement : MonoBehaviour
 
     private void AdjustSpriteOpacity(Unit unit, float opacity)
     {
-        SpriteRenderer[] spriteRenderers = unit.GetComponentsInChildren<SpriteRenderer>();
-        foreach (var spriteRenderer in spriteRenderers)
-        {
-            Color color = spriteRenderer.color;
-            color.a = opacity;
-            spriteRenderer.color = color;
-        }
+        SpriteRenderer spriteRenderer = unit.GetComponent<SpriteRenderer>();
+        _origColor = spriteRenderer.color;
+        Color color = spriteRenderer.color;
+        color.a = opacity;
+        spriteRenderer.color = color;
     }
 
     private void Update()
@@ -73,11 +72,14 @@ public class UnitPlacement : MonoBehaviour
         _unitCollider.enabled = false;
         _currentUnit.tag = "Untagged";
         Vector2 placementPos2D = placementPos;
-        float radius = _unitCollider.bounds.size.magnitude / 2f;
+        float diagonalLength = Mathf.Sqrt(Mathf.Pow(_unitCollider.size.x, 2) + Mathf.Pow(_unitCollider.size.y, 2));
+        float radius = diagonalLength / 2f;
         LayerMask combinedLayerMask = unitLayer | LayerMask.GetMask("NoPlacement");
+        SpriteRenderer spriteRenderer = _currentUnit.GetComponent<SpriteRenderer>();
 
         _isPlacementValid = !Physics2D.OverlapCircle(placementPos2D, radius, combinedLayerMask);
 
+        spriteRenderer.color = _isPlacementValid ? _origColor : Color.red;
         GameObject closestSpot = gameManager.GetClosestPlacementSpot(placementPos);
         bool snapToSpot = closestSpot != null && Vector3.Distance(placementPos, closestSpot.transform.position) <= snapDistance;
         _currentUnit.transform.position = snapToSpot ? closestSpot.transform.position : placementPos;
@@ -105,6 +107,8 @@ public class UnitPlacement : MonoBehaviour
             {
                 unitPlacedEvent?.Invoke();
             }
+            gameManager.levelManager.Points -= _currentUnit.cost;
+            gameManager.levelManager.UpdatePointsUI();
             _currentUnit = null;
         }
         else

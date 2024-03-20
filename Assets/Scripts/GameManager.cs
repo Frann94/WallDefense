@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public Transform unitButtonParent;
     public Dictionary<int, Unit> placedUnits = new Dictionary<int, Unit>();
     public LevelManager levelManager;
+    public GameObject pointsText;
 
     private Unit _selectedUnit;
     private int _selectedUnitIndex;
@@ -88,32 +89,5 @@ public class GameManager : MonoBehaviour
     public void RemoveUnit(int unitIndex)
     {
         placedUnits.Remove(unitIndex);
-    }
-
-    public void UpgradeUnit(int unitIndex)
-    {
-        if (!placedUnits.ContainsKey(unitIndex))
-        {
-            return;
-        }
-
-        Unit unit = placedUnits[unitIndex];
-        int upgradeCost = CalculateUpgradeCost(unit.upgradeLevel);
-
-        if (levelManager.Points >= upgradeCost)
-        {
-            unit.UpgradeUnit();
-            levelManager.Points -= upgradeCost;
-            levelManager.UpdatePointsUI();
-        }
-        else
-        {
-            Debug.Log("Not enough points to upgrade.");
-        }
-    }
-
-    private int CalculateUpgradeCost(int upgradeLevel)
-    {
-        return 10 * (upgradeLevel + 1);
     }
 }

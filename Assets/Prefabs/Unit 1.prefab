@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitIcon: {fileID: 216770041, guid: c7d332c957b7e524e8f937652724dc57, type: 3}
-  cost: 0
+  cost: 5
   cooldown: 5
   enemyLayer:
     serializedVersion: 2

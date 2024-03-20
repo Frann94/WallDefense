@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.Events;
+using System.Collections.Generic;
 
 public class UnitButton : MonoBehaviour, IPointerDownHandler
 {
@@ -16,6 +17,7 @@ public class UnitButton : MonoBehaviour, IPointerDownHandler
     private int _unitIndex;    
     private bool _isCooldown = false;
     private float _cooldownTime = 0f;
+    private GameObject _currentFloatingText;
 
     private void Awake()
     {
@@ -43,12 +45,12 @@ public class UnitButton : MonoBehaviour, IPointerDownHandler
         UpdateButtonState();
     }
 
-    private void UpdateButtonState()
+    public void UpdateButtonState()
     {
         Unit selectedUnit = GameManager.instance.playerUnits[_unitIndex];
-        if (selectedUnit.tag == "BlockedUnit")
+        LevelManager levelManager = GameManager.instance.levelManager;
+        if (selectedUnit.tag == "BlockedUnit" || selectedUnit.cost > levelManager.Points || _isCooldown==true)
         {
-            _isCooldown = true;
             unitButton.interactable = false;
         }
         else
@@ -56,6 +58,11 @@ public class UnitButton : MonoBehaviour, IPointerDownHandler
             _isCooldown = false;
             unitButton.interactable = true;
         }
+    }
+
+    public void Update()
+    {
+        UpdateButtonState();
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -72,7 +79,7 @@ public class UnitButton : MonoBehaviour, IPointerDownHandler
         {
             _audioSource.clip = upgradeSound;
             _audioSource.Play();
-            GameManager.instance.UpgradeUnit(_unitIndex);
+            UpgradeUnit(_unitIndex);
         }
         else
         {
@@ -80,6 +87,58 @@ public class UnitButton : MonoBehaviour, IPointerDownHandler
             _audioSource.Play();
             GameManager.instance.SelectUnit(_unitIndex);
             GameManager.instance.unitPlacement.OnUnitButtonPress(selectedUnit, _unitIndex);
+        }
+    }
+
+    public void UpgradeUnit(int unitIndex)
+    {
+        Dictionary<int, Unit> placedUnits = GameManager.instance.placedUnits;
+        if (!placedUnits.ContainsKey(unitIndex))
+        {
+            return;
+        }
+
+        Unit unit = placedUnits[unitIndex];
+        if (unit.upgradeLevel==5)
+        {
+            ShowFloatingText("Max Level!", unit.transform.position);
+            return;
+        }
+        int upgradeCost = CalculateUpgradeCost(unit.cost, unit.upgradeLevel);
+        LevelManager levelManager = GameManager.instance.levelManager;
+        if (levelManager.Points >= upgradeCost)
+        {
+            ShowFloatingText("Level Up! (-" + upgradeCost + "p)", unit.transform.position);
+            unit.UpgradeUnit();
+            levelManager.Points -= upgradeCost;
+            levelManager.UpdatePointsUI();
+            StartCooldown();
+        }
+        else
+        {
+            ShowFloatingText("You need " + upgradeCost + " points!", unit.transform.position);
+        }
+    }
+
+    private int CalculateUpgradeCost(int unitCost, int upgradeLevel)
+    {
+        return unitCost * (upgradeLevel + 1);
+    }
+
+    private void ShowFloatingText(string text, Vector3 unitPos)
+    {
+        GameObject pointsText = GameManager.instance.pointsText;
+        if (pointsText != null)
+        {
+            if (_currentFloatingText != null)
+            {
+                _currentFloatingText.SetActive(false);
+            }
+            GameObject floatingText = Instantiate(pointsText, unitPos, Quaternion.identity);
+            floatingText.GetComponent<TextMesh>().text = text;
+            floatingText.transform.position += new Vector3(-1.5f, 1.5f, 0f);
+            Destroy(floatingText,3f);
+            _currentFloatingText = floatingText;
         }
     }
 

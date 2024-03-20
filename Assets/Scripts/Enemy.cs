@@ -7,13 +7,14 @@ public class Enemy : MonoBehaviour
     public float MaxHealth { get; set; } = 100f;
     public float CurrentHealth { get; set; } = 100f;
     public float Damage { get; set; } = 5f;
-    public float Range { get; set; } = 1f;
+    public float Range { get; set; } = 1.25f;
     public float FireRate { get; set; } = 1f;
     public AudioSource AudioSource { get; set; }
     public bool IsDead { get => _isDead; protected set => _isDead = value; }
 
     protected Rigidbody2D Body;
     private Animator _animator;
+    private GameObject _target;
     private bool _isDead;
     private bool _canAttack = true;
 
@@ -24,44 +25,48 @@ public class Enemy : MonoBehaviour
 
     protected void Move()
     {
-        if (!_isDead) {
-            GameObject target = FindNearestToAttack();
-            if ((target.transform.position - transform.position).magnitude > Range)
+        if (!_isDead)
+        {
+            if (_target == null)
             {
-                if (target.tag == "Wall" && transform.position.x > target.transform.position.x)
-                {
-                    Body.velocity = new Vector2(-Movespeeed, 0f);
-                }
-                else if (target.tag == "Player")
-                {
-                    Body.velocity = (FindNearestToAttack().transform.position - transform.position).normalized * Movespeeed;
-                }
-                else
-                {
-                    Body.velocity = new Vector2(0, 0);
-                    Attack(target);
-                }
+                _target = GameObject.FindGameObjectWithTag("Wall");
+            }
+            GameObject targetUnit = FindNearestUnit();
+            if (targetUnit != null)
+            {
+                _target = targetUnit;
+            }
+            float distanceToTarget = Mathf.Abs(transform.position.x - _target.transform.position.x);
+
+            if (distanceToTarget <= Range)
+            {
+                Body.velocity = new Vector2(0, 0);
+                Attack(_target);
             }
             else
             {
-                Body.velocity = new Vector2(0, 0);
-                Attack(target);
+                Body.velocity = (_target.transform.position - transform.position).normalized * Movespeeed;
             }
         }
     }
 
-    protected GameObject FindNearestToAttack()
+    protected GameObject FindNearestUnit()
     {
-        GameObject[] attackable = GameObject.FindGameObjectsWithTag("Player");
-        GameObject target = GameObject.FindGameObjectWithTag("Wall");
-        foreach (GameObject a in attackable)
+        GameObject[] units = GameObject.FindGameObjectsWithTag("Player");
+        GameObject targetUnit = null;
+        float shortestDistance = Mathf.Infinity;
+
+        foreach (GameObject unit in units)
         {
-            if ((transform.position - a.transform.position).magnitude < (transform.position - target.transform.position).magnitude)
+            float distance = Mathf.Abs(transform.position.magnitude - unit.transform.position.magnitude);
+            if (distance <= Range * 2 && distance < shortestDistance)
             {
-                target = a;
+                targetUnit = unit;
+                shortestDistance = distance;
             }
         }
-        return target;
+
+        return targetUnit;
     }
 
     private void Attack(GameObject target)
@@ -88,6 +93,10 @@ public class Enemy : MonoBehaviour
         if (unitTarget != null)
         {
             unitTarget.TakeDamage(Damage);
+            if (unitTarget.CurrentHealth <= 0)
+            {
+                _target = null;
+            }
         }
 
         var wallTarget = target.GetComponent<Wall>();
@@ -124,6 +133,7 @@ public class Enemy : MonoBehaviour
 
     private void IncrementPlayerPoints()
     {
+        ShowFloatingText(5);
         LevelManager levelManager = FindObjectOfType<LevelManager>();
         if (levelManager != null)
         {
@@ -140,5 +150,37 @@ public class Enemy : MonoBehaviour
         AudioSource.Play();
         yield return new WaitForSeconds(5.0f);
         Destroy(gameObject);
+    }
+
+    private void ShowFloatingText(int points)
+    {
+        GameObject pointsText = GameManager.instance.pointsText;
+        if (pointsText != null)
+        {
+            GameObject floatingText = Instantiate(pointsText, transform.position, Quaternion.identity);
+            floatingText.GetComponent<TextMesh>().text = "+" + points.ToString();
+            floatingText.transform.position += new Vector3(0f, 1.5f, 0f);
+            StartCoroutine(FadeOutFloatingText(floatingText));
+        }
+    }
+
+    private IEnumerator FadeOutFloatingText(GameObject floatingText)
+    {
+        TextMesh textMesh = floatingText.GetComponent<TextMesh>();
+        Vector3 startPosition = floatingText.transform.position;
+        Color startColor = textMesh.color;
+        Vector3 targetPosition = startPosition + Vector3.up * 2f;
+        Color targetColor = new Color(startColor.r, startColor.g, startColor.b, 0f);
+
+        float elapsedTime = 0f;
+        while (elapsedTime < 3f)
+        {
+            floatingText.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / 3f);
+            textMesh.color = Color.Lerp(startColor, targetColor, elapsedTime / 3f);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        Destroy(floatingText);
     }
 }

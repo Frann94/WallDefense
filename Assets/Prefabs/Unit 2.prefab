@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: -6022130922734212933}
   - component: {fileID: 2050768167223230356}
   - component: {fileID: 1654705454}
-  - component: {fileID: 3212439159821365259}
+  - component: {fileID: 8623531395352616216}
+  - component: {fileID: 6188826872577772661}
   m_Layer: 6
   m_Name: Unit 2
   m_TagString: Player
@@ -76,12 +77,12 @@ SpriteRenderer:
   m_SortingLayerID: 883908097
   m_SortingLayer: 2
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 0ccc508108fa6ed4fa11b4a467d7f609, type: 3}
-  m_Color: {r: 0.24146464, g: 0.23740657, b: 0.9150943, a: 1}
+  m_Sprite: {fileID: 1054288472, guid: dfb2462759a1c914f801ebd28556bd1b, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.48, y: 0.48}
+  m_Size: {x: 0.29, y: 0.37}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -104,8 +105,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.64, y: 0.64}
-    newSize: {x: 0.48, y: 0.48}
+    oldSize: {x: 0.58, y: 0.74}
+    newSize: {x: 0.29, y: 0.37}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -125,22 +126,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 185b1d3a7c387314d9a51c7206327121, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitIcon: {fileID: 21300000, guid: 0ccc508108fa6ed4fa11b4a467d7f609, type: 3}
-  cost: 0
-  cooldown: 10
+  unitIcon: {fileID: 216770041, guid: c7d332c957b7e524e8f937652724dc57, type: 3}
+  cost: 5
+  cooldown: 5
   enemyLayer:
     serializedVersion: 2
     m_Bits: 1536
   attackRange: 5
-  attackDamage: 1
-  attackCooldown: 1
-  targetSelectionCooldown: 5
+  attackDamage: 10
+  attackCooldown: 0.5
+  targetSelectionCooldown: 0.5
   unitIndex: 1
   upgradeLevel: 0
   shoot: {fileID: 8300000, guid: 0fa0654c5caa80742b0a36ea63741521, type: 3}
   dying: {fileID: 8300000, guid: ab9ff16a8d1958e498307120ad209d27, type: 3}
-  soundInterval: 1
---- !u!82 &3212439159821365259
+  soundInterval: 0.4
+--- !u!82 &8623531395352616216
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -150,9 +151,9 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 0fa0654c5caa80742b0a36ea63741521, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 3faf42dd83fb2c94b80788530310c3e9, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -236,3 +237,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!95 &6188826872577772661
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3234878282958606444}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9e0d2658bd848fa47827cbd823229617, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
