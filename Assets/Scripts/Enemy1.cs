@@ -4,22 +4,20 @@ using UnityEngine;
 
 public class Enemy1 : Enemy
 {
-    // Start is called before the first frame update
     void Start()
     {
-        body = GetComponent<Rigidbody2D>();
-        body.velocity = new Vector2(-Movespeeed, 0);
-        fireCount = FireRate;
+        Body = GetComponent<Rigidbody2D>();
+        Body.velocity = new Vector2(-Movespeeed, 0);
         AudioSource = GetComponent<AudioSource>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Move();
-        fireCount -= Time.deltaTime;
-        if (CurrentHealth <= 0) {
-            Die();
+        if (IsDead)
+        {
+            return;
         }
+
+        Move();
     }
 }

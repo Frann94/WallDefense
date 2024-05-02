@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Unit : MonoBehaviour
@@ -17,79 +16,117 @@ public class Unit : MonoBehaviour
     private GameObject currentTarget;
     private float nextAttackTime;
     private float nextTargetSelectionTime;
-    public float MaxHealth { get; set; } = 1000f;
-    public float CurrentHealth { get; set; } = 5f;
-    public event System.Action OnUnitDied;
+
+    public float MaxHealth { get; set; } = 50f;
+    public float CurrentHealth = 50f;
     public int unitIndex;
     public int upgradeLevel;
+
     private AudioSource audioSource;
     public AudioClip shoot;
     public AudioClip dying;
     public float soundInterval;
     private bool playShootSound = true;
+    private Animator animator;
+    public bool IsBeingPlaced { get; set; } = false;
+
+    public event System.Action OnUnitDied;
 
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
-            // Only select a new target if the cooldown has elapsed and the current target is null or out of range
-            if (Time.time >= nextTargetSelectionTime || currentTarget == null)
-            {
-                SelectTarget();
-                nextTargetSelectionTime = Time.time + targetSelectionCooldown;
-            }
+        if (gameObject.CompareTag("BlockedUnit") || IsBeingPlaced || animator.GetBool("isDead"))
+        {
+            return;
+        }
+        if (CurrentHealth<MaxHealth)
+        {
+            CurrentHealth += 1f * Time.deltaTime;
+        }
 
-            // Only attack if there is a target and the attack cooldown has elapsed
-            if (currentTarget != null && Time.time >= nextAttackTime && Vector2.Distance(transform.position, currentTarget.transform.position) <= attackRange)
-            {
-                Attack(currentTarget);
-                nextAttackTime = Time.time + attackCooldown;
-            }
-            if (CurrentHealth <= 0)
-            {
-                Die();
-            }
+        if (currentTarget == null || currentTarget.GetComponent<Enemy>().IsDead)
+        {
+            currentTarget = null;
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        }
+
+        if (Time.time >= nextTargetSelectionTime || currentTarget == null)
+        {
+            SelectTarget();
+            nextTargetSelectionTime = Time.time + targetSelectionCooldown;
+        }
+
+        if (currentTarget != null && Time.time >= nextAttackTime && Vector2.Distance(transform.position, currentTarget.transform.position) <= attackRange)
+        {
+            FlipTowardsEnemy(currentTarget.transform.position);
+            Attack(currentTarget);
+            nextAttackTime = Time.time + attackCooldown;
+        }
+
+        if (CurrentHealth <= 0)
+        {
+            Die();
+        }
     }
 
     private void SelectTarget()
     {
-        // Find all enemies within attack range
         Collider2D[] enemiesInRange = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayer);
+        GameObject closestEnemy = null;
+        float closestDistance = Mathf.Infinity;
 
-        if (enemiesInRange.Length > 0)
+        foreach (Collider2D enemyCollider in enemiesInRange)
         {
-            // Select the closest enemy
-            GameObject closestEnemy = enemiesInRange[0].gameObject;
-
-            for (int i = 1; i < enemiesInRange.Length; i++)
+            Enemy enemy = enemyCollider.GetComponent<Enemy>();
+            if (enemy != null && !enemy.IsDead)
             {
-                if (Vector2.Distance(transform.position, enemiesInRange[i].transform.position) < Vector2.Distance(transform.position, closestEnemy.transform.position))
+                float distance = Vector2.Distance(transform.position, enemyCollider.transform.position);
+                if (distance < closestDistance)
                 {
-                    closestEnemy = enemiesInRange[i].gameObject;
+                    closestDistance = distance;
+                    closestEnemy = enemyCollider.gameObject;
                 }
             }
+        }
 
-            // If there's no current target, or if the closest enemy is closer than the current target, switch targets
-            if (currentTarget == null || Vector2.Distance(transform.position, closestEnemy.transform.position) < Vector2.Distance(transform.position, currentTarget.transform.position))
-            {
-                currentTarget = closestEnemy;
-            }
+        currentTarget = closestEnemy;
+    }
+
+    private void FlipTowardsEnemy(Vector3 enemyPosition)
+    {
+        bool isEnemyToLeft = enemyPosition.x < transform.position.x;
+        if (isEnemyToLeft != transform.localScale.x < 0)
+        {
+            Vector3 flippedScale = transform.localScale;
+            flippedScale.x *= -1;
+            transform.localScale = flippedScale;
         }
     }
 
-
     private void Attack(GameObject target)
     {
-        // Damage the target
-        
+        if (!animator.GetBool("isAttacking"))
+        {
+            StartCoroutine(PerformAttack(target));
+        }
+    }
+
+    private IEnumerator PerformAttack(GameObject target)
+    {
+        animator.SetBool("isAttacking", true);
         target.GetComponent<Enemy>().TakeDamage(attackDamage);
+
         if (playShootSound)
         {
             StartCoroutine(PlayShootingSound());
         }
+        yield return new WaitForSeconds(attackCooldown);
+        animator.SetBool("isAttacking", false);
     }
 
     private IEnumerator PlayShootingSound()
@@ -97,27 +134,46 @@ public class Unit : MonoBehaviour
         playShootSound = false;
         audioSource.clip = shoot;
         audioSource.Play();
-        yield return new WaitForSeconds(soundInterval); // Wait for 1 second
+        yield return new WaitForSeconds(soundInterval);
         playShootSound = true;
     }
 
-    private IEnumerator PlayDyingSound()
+    public void TakeDamage(float damage)
     {
-        audioSource.clip = dying;
-        audioSource.Play();
-        yield return new WaitForSeconds(2);
-    }
-
-    public void TakeDamage(float damage) {
         CurrentHealth -= damage;
     }
 
     public void Die()
     {
-        StartCoroutine(PlayDyingSound());
+        StartCoroutine(PerformDeath());
+    }
+
+    private IEnumerator PerformDeath()
+    {
+        audioSource.clip = dying;
+        audioSource.Play();
+        animator.SetBool("isDead", true);
+        gameObject.tag = "Untagged";
+        GetComponent<Collider2D>().enabled = false;
+        yield return new WaitForSeconds(4);
         GameManager.instance.RemoveUnit(unitIndex);
         OnUnitDied?.Invoke();
         Destroy(gameObject);
     }
-}
 
+    public void UpgradeUnit()
+    {
+        upgradeLevel++;
+        CurrentHealth += 20;
+        MaxHealth += 20;
+
+        if (attackCooldown > 0.2f)
+        {
+            attackCooldown -= 0.1f;
+        }
+        if (attackDamage < 50f)
+        {
+            attackDamage += 5;
+        }
+    }
+}

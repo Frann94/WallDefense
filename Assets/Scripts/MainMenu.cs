@@ -8,26 +8,29 @@ public class MainMenu : MonoBehaviour
 
     public void StartGame()
     {
-        StartCoroutine(PlaySoundAndLoadScene("Map1"));
+        if (Time.timeScale == 0)
+        {
+            Time.timeScale = 1;
+        }
+        StartCoroutine(LoadSceneAfterSound("Map1"));
     }
 
     public void ExitGame()
     {
-        // Sound for Exit game is usually different
-        StartCoroutine(PlaySoundAndExit());
+        StartCoroutine(LoadSceneAfterSound(null));
     }
 
-    private IEnumerator PlaySoundAndLoadScene(string sceneName)
+    private IEnumerator LoadSceneAfterSound(string sceneName)
     {
         menuSound.Play();
         yield return new WaitForSeconds(menuSound.clip.length);
-        SceneManager.LoadScene(sceneName);
-    }
-
-    private IEnumerator PlaySoundAndExit()
-    {
-        menuSound.Play();
-        yield return new WaitForSeconds(menuSound.clip.length);
-        Application.Quit();
-    }
+        if (sceneName != null)
+        {
+            SceneManager.LoadScene(sceneName);
+        }
+        else
+        {
+            Application.Quit();
+        }
+    }    
 }
